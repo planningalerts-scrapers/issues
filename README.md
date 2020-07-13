@@ -1,2 +1,2 @@
 # issues
-Only for keeping track of all issues related to scraping
+Only for keeping track of all issues related to scraping. Rather then keeping track of issues related to particular scrapers in their repos we're going to track all issues together in this one place. That should hopefully make it easier to deal with situations where, for instance, an authority moves from one system to another and so effectively we would be removing them from one scraper and adding them to another (for the multi scrapers).
