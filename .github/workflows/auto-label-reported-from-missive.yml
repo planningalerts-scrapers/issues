@@ -23,6 +23,15 @@ jobs:
               return;
             }
 
+            const alreadyReported = (issue.labels || []).some((label) => {
+              const name = typeof label?.name === "string" ? label.name : "";
+              return name.toLowerCase() === "reported";
+            });
+
+            if (alreadyReported) {
+              return;
+            }
+
             const body = comment.body || "";
 
             // Match Missive conversation URLs like:
