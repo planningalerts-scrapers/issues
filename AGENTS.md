@@ -120,7 +120,7 @@ neither ever removes a label.
 | Workflow | Trigger | What it does |
 | --- | --- | --- |
 | `.github/workflows/label-reported.yml` | A comment is posted | Adds `reported` when the comment starts with `Missive conversation:` |
-| `.github/workflows/label-from-project.yml` | Daily, or manually | Adds the system label implied by `Scraper (Morph)`, and `ready awaiting budget` when Status is `Budget wait` |
+| `.github/workflows/label-from-project.yml` | Daily, or manually | Adds the system label implied by `Scraper (Morph)`, and `ready awaiting budget` when Status is `Budget wait` — **does nothing until the `planningalerts-bot` secrets described in the workflow are configured** |
 
 The slug-to-label mapping lives in `.github/scraper-labels.json`, so adding a new
 multi-scraper means editing that file, not the script.

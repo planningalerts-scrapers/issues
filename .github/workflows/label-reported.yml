@@ -53,9 +53,12 @@ jobs:
 
           # A removed label is a decision, not an absence: if someone has taken `reported`
           # off this issue, don't put it back.
-          REMOVALS="$(gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/timeline" --paginate \
-            --jq "[.[] | select(.event == \"unlabeled\" and .label.name == \"${LABEL}\")] | length")"
-          if [ "$REMOVALS" != "0" ]; then
+          #
+          # Grep the stream rather than count it: `--paginate` applies `--jq` per page and
+          # concatenates, so a count would come back as "0\n0" once the timeline exceeds
+          # one page, and the veto would fire on every busy issue.
+          if gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/timeline" --paginate \
+              --jq '.[] | select(.event == "unlabeled") | .label.name' | grep -qxF "$LABEL"; then
             echo "\`${LABEL}\` was previously removed from issue #${ISSUE_NUMBER}, leaving it off."
             exit 0
           fi
