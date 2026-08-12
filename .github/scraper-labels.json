@@ -1,0 +1,45 @@
+{
+  "_comment": "Mapping used by .github/scripts/label_from_project.py. See AGENTS.md.",
+
+  "_scraper_labels_comment": "morph.io slug -> the system label for authorities that scraper handles. Only multi-authority scrapers appear here: whether a bespoke single-authority scraper counts as `custom` is a judgement call, so those are deliberately left unmapped.",
+  "scraper_labels": {
+    "multiple_masterview": "masterview",
+    "multiple_greenlight": "greenlight",
+    "multiple_epathway_scraper": "epathway",
+    "multiple_icon": "icon",
+    "multiple_technology_one": "technology one",
+    "multiple_horizon": "horizon",
+    "multiple_civica": "civica",
+    "multiple_nsw_planning_lgas": "nsw planning portal",
+    "multiple_atdis": "ATDIS",
+    "multiple_developmenti": "development-i",
+    "multiple_cianywhere": "ci-anywhere",
+    "multiple_html_table": "html table",
+    "multiple_div_cards": "div_card",
+    "multiple_ePlanning": "ePlanning",
+    "master_planbuild": "planbuild (tas)"
+  },
+
+  "_system_labels_comment": "Every label that answers 'which system is this authority on'. If an issue already carries one of these, the scraper-derived label is skipped -- that is what protects authorities whose label has deliberately moved ahead of their Scraper (Morph) field.",
+  "system_labels": [
+    "masterview",
+    "greenlight",
+    "epathway",
+    "icon",
+    "technology one",
+    "horizon",
+    "civica",
+    "nsw planning portal",
+    "ATDIS",
+    "development-i",
+    "ci-anywhere",
+    "html table",
+    "div_card",
+    "ePlanning",
+    "planbuild (tas)",
+    "granicus",
+    "elementorg",
+    "DxP T1",
+    "custom"
+  ]
+}
