@@ -1,0 +1,59 @@
+name: Label issues from the project
+
+# Applies the labels that can be derived from the org project -- the system label implied
+# by `Scraper (Morph)`, and `ready awaiting budget` from the `Status` field. Add-only, and
+# it never re-applies a label that has been removed. See AGENTS.md.
+#
+# Reading an org-level project needs more than the built-in GITHUB_TOKEN, so this mints an
+# installation token for the planningalerts-bot GitHub App (App ID 4480419), which already
+# has Issues: write and Organization projects: read. `actions/create-github-app-token` is
+# GitHub-owned, so it satisfies this org's Actions allowlist.
+#
+# Required repository secrets:
+#   PLANNINGALERTS_BOT_APP_ID       -- 4480419
+#   PLANNINGALERTS_BOT_PRIVATE_KEY  -- a private key generated for that app
+#
+# Manual runs default to a dry run, so you can see what would change before it changes.
+
+on:
+  schedule:
+    # Runs daily. Scheduled workflows are disabled by GitHub after 60 days of repo
+    # inactivity, so workflow_dispatch is kept as a manual fallback.
+    - cron: "42 19 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report what would change without applying any labels"
+        type: boolean
+        default: true
+
+# Only what actions/checkout needs. Labels are written with the app token, not this one.
+permissions:
+  contents: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mint a planningalerts-bot token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.PLANNINGALERTS_BOT_APP_ID }}
+          private-key: ${{ secrets.PLANNINGALERTS_BOT_PRIVATE_KEY }}
+
+      - name: Apply labels derived from the project
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          # Scheduled runs apply for real; manual runs dry-run unless told otherwise.
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN" = "true" ]; then
+            python3 .github/scripts/label_from_project.py --dry-run
+          else
+            python3 .github/scripts/label_from_project.py
+          fi

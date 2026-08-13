@@ -1,0 +1,67 @@
+name: Label reported issues
+
+# Adds the `reported` label when someone links a Missive conversation on an issue.
+# See AGENTS.md for the convention: a comment beginning `Missive conversation:` means
+# somebody outside the team told us this authority was broken.
+#
+# Uses the gh CLI only (no third-party actions): this org's Actions policy allows only
+# GitHub-owned/verified actions, and the gh CLI is a preinstalled runner tool rather than
+# a marketplace action, so it isn't subject to that allowlist.
+#
+# The comment body is attacker-controlled -- this is a public repo and anyone can comment.
+# It is passed to the script via `env:` and never interpolated into the shell, and the
+# author must be a member/owner/collaborator before we act on it.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    # Skip pull request comments, and comments from outside the team.
+    if: >-
+      github.event.issue.pull_request == null &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add `reported` if this comment links a Missive conversation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          LABEL="reported"
+
+          # Strict prefix. `Missive conversation (email to council):`, `Email sent:` and
+          # similar are outbound correspondence and deliberately do not count.
+          if ! printf '%s' "$COMMENT_BODY" | grep -qE '^[[:space:]]*Missive conversation:'; then
+            echo "No \`Missive conversation:\` line in this comment, nothing to do."
+            exit 0
+          fi
+
+          if gh issue view "$ISSUE_NUMBER" --repo "$REPO" --json labels \
+              --jq '.labels[].name' | grep -qxF "$LABEL"; then
+            echo "Issue #${ISSUE_NUMBER} already has \`${LABEL}\`."
+            exit 0
+          fi
+
+          # A removed label is a decision, not an absence: if someone has taken `reported`
+          # off this issue, don't put it back.
+          #
+          # Grep the stream rather than count it: `--paginate` applies `--jq` per page and
+          # concatenates, so a count would come back as "0\n0" once the timeline exceeds
+          # one page, and the veto would fire on every busy issue.
+          if gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/timeline" --paginate \
+              --jq '.[] | select(.event == "unlabeled") | .label.name' | grep -qxF "$LABEL"; then
+            echo "\`${LABEL}\` was previously removed from issue #${ISSUE_NUMBER}, leaving it off."
+            exit 0
+          fi
+
+          gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label "$LABEL"
+          echo "Added \`${LABEL}\` to issue #${ISSUE_NUMBER}." >> "$GITHUB_STEP_SUMMARY"
