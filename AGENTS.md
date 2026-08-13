@@ -13,7 +13,7 @@ Development.i, the fix spans two scraper repos plus a change to the PlanningAler
 authority record. A single issue can hold that whole story; three issues in three repos
 cannot.
 
-Issues are opened from the PlanningAlerts side and currently appear under `@mlandauer`.
+Issues are opened from the PlanningAlerts side and currently appear under `@mlandauer` (there is an open issue to change this to a service user).
 
 ## Where the real data is
 
