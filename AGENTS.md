@@ -136,6 +136,35 @@ Three rules constrain both:
 3. **Single-authority scrapers get no system label.** Whether a bespoke scraper counts as
    `custom` is a judgement call, so the automation leaves it alone.
 
+## Working on scraper pull requests
+
+Lessons from PR review rounds across the org's scraper repos (act#9, maribyrnong#2,
+moreton_bay_qld#1, nsw_joint_regional_planning_panels#8,
+nsw_office_of_liquor_gaming_and_racing#5):
+
+- Every scraper repo needs a `platform` file containing exactly `heroku-18`
+  (newline-terminated). Morph uses it to pick the build stack; a Ruby upgrade PR without
+  it is broken even if CI is green. This is the single most common review rejection.
+- Match the conventions in [`ianheggie-oaf/example_ruby_scraper`](https://github.com/ianheggie-oaf/example_ruby_scraper):
+  a README.md (morph.io boilerplate, a link back to this issues repo, run instructions,
+  expected output), an explicit `Finished - added N records` line at the end of
+  `scraper.rb`, a `.rubocop.yml` with `NewCops`/`TargetRubyVersion`, an expanded
+  `.gitignore`, and the morph.io comment header in the `Gemfile`.
+- `ianheggie-oaf` reviews scraper PRs, and a `CHANGES_REQUESTED` review blocks merging.
+  After addressing feedback, re-request review with
+  `gh api repos/<owner>/<repo>/pulls/<n>/requested_reviewers -f 'reviewers[]=ianheggie-oaf'`
+  — pushing new commits alone does not re-request it.
+- He sometimes fixes and tests a PR on his own fork (`ianheggie-oaf/<scraper>`) and says
+  so in the review. When he has, cherry-pick his commits with authorship preserved rather
+  than re-implementing; his versions are already verified on morph.io.
+- Default branches vary between scraper repos (`master` on older ones, `main` on newer) —
+  check per repo, never assume.
+- Merging to the default branch deploys: morph.io runs whatever is on it. Do not merge
+  over an unresolved blocking review.
+- Verify locally before pushing: `ruby -c scraper.rb`, `bundle exec rspec`,
+  `bundle exec rubocop`. Stricter `.rubocop.yml` settings routinely surface autocorrectable
+  offences in older scrapers.
+
 ## Conventions
 
 - Never remove a curated label to make it match the `Scraper (Morph)` field.
@@ -144,4 +173,6 @@ Three rules constrain both:
 - Follow the org [CONTRIBUTING.md](https://github.com/planningalerts-scrapers/.github/blob/main/CONTRIBUTING.md)
   otherwise: branch names like `chore/123-short-description`, fill in the pull request
   template, assign the pull request to yourself.
-- Every commit ends with `Assisted-by: Claude Code:<model-id>` in the trailer block.
+- Every commit ends with an `Assisted-by: <agent>:<model-id>` trailer naming the agent
+  and model actually used, e.g. `Assisted-by: Claude Code:claude-opus-4-6` or
+  `Assisted-by: OpenCode:anthropic.claude-fable-5`.
