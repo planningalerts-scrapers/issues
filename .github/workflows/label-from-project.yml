@@ -40,12 +40,19 @@ jobs:
 
       - name: Mint a planningalerts-bot token
         id: app-token
+        if: ${{ secrets.PLANNINGALERTS_BOT_APP_ID != '' && secrets.PLANNINGALERTS_BOT_PRIVATE_KEY != '' }}
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.PLANNINGALERTS_BOT_APP_ID }}
           private-key: ${{ secrets.PLANNINGALERTS_BOT_PRIVATE_KEY }}
 
+      - name: Skip when planningalerts-bot secrets are not configured
+        if: ${{ secrets.PLANNINGALERTS_BOT_APP_ID == '' || secrets.PLANNINGALERTS_BOT_PRIVATE_KEY == '' }}
+        run: |
+          echo "Skipping label-from-project: PLANNINGALERTS_BOT_APP_ID / PLANNINGALERTS_BOT_PRIVATE_KEY are not configured." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Apply labels derived from the project
+        if: ${{ steps.app-token.outputs.token != '' }}
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           # Scheduled runs apply for real; manual runs dry-run unless told otherwise.
