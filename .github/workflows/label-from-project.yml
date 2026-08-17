@@ -10,7 +10,8 @@ name: Label issues from the project
 # GitHub-owned, so it satisfies this org's Actions allowlist.
 #
 # Required repository secrets:
-#   PLANNINGALERTS_BOT_APP_ID       -- 4480419
+#   PLANNINGALERTS_BOT_APP_ID       -- 4480419 (passed to `client-id`, which accepts an
+#                                      App ID or a Client ID interchangeably)
 #   PLANNINGALERTS_BOT_PRIVATE_KEY  -- a private key generated for that app
 #
 # Manual runs default to a dry run, so you can see what would change before it changes.
@@ -36,13 +37,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Mint a planningalerts-bot token
         id: app-token
         uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ secrets.PLANNINGALERTS_BOT_APP_ID }}
+          client-id: ${{ secrets.PLANNINGALERTS_BOT_APP_ID }}
           private-key: ${{ secrets.PLANNINGALERTS_BOT_PRIVATE_KEY }}
 
       - name: Apply labels derived from the project
