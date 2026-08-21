@@ -165,6 +165,14 @@ nsw_office_of_liquor_gaming_and_racing#5):
   `bundle exec rubocop`. Stricter `.rubocop.yml` settings routinely surface autocorrectable
   offences in older scrapers.
 
+## Scraper repo stubs
+
+Every scraper repo carries a stub `AGENTS.md` (plus a `CLAUDE.md` importing it)
+that points agents back to this file. This file is the single source of truth
+for org-wide agent guidance — update it here, not in the scraper repos. The
+stubs deliberately contain no guidance of their own so agents always fetch the
+current version of this file.
+
 ## Conventions
 
 - Never remove a curated label to make it match the `Scraper (Morph)` field.
