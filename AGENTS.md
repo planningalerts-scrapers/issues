@@ -234,12 +234,16 @@ GitHub Actions is green: in most of these repos there is nothing running.
 ### Review
 
 Every repo's `.github/CODEOWNERS` names the
-`@planningalerts-scrapers/scraper-reviewers` team, so opening a pull request
-requests review from that team automatically. **Do not request reviewers by
-hand.** A pull request with no review requested on it means that repo's
-CODEOWNERS is missing, or the team has lost write access to it. GitHub silently
-ignores a CODEOWNERS naming a team without access rather than reporting an error,
-so fix the cause instead of assigning someone manually.
+`@planningalerts-scrapers/scraper-reviewers` team, and GitHub requests that team
+automatically. **Do not request reviewers by hand.**
+
+That request only fires when a pull request is marked ready for review. Code
+owners are deliberately not requested on drafts, so a draft with no reviewer on
+it is normal and not a fault. Once a pull request is out of draft and still has
+nobody requested, that repo's CODEOWNERS is missing or the team has lost write
+access to it. GitHub silently ignores a CODEOWNERS naming a team without access
+rather than reporting an error, so fix the cause instead of assigning someone
+manually.
 
 In practice `ianheggie-oaf` reviews most scraper pull requests. Two things follow:
 
