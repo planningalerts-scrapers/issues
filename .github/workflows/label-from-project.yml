@@ -18,8 +18,9 @@ name: Label issues from the project
 
 on:
   schedule:
-    # Runs daily. Scheduled workflows are disabled by GitHub after 60 days of repo
-    # inactivity, so workflow_dispatch is kept as a manual fallback.
+    # Runs daily. GitHub disables scheduled workflows after 60 days without a commit, and
+    # this repo has no code changes, so the `keepalive` job below re-enables the workflow
+    # on every scheduled run. workflow_dispatch is kept as a manual fallback.
     - cron: "42 19 * * *"
   workflow_dispatch:
     inputs:
@@ -58,3 +59,18 @@ jobs:
           else
             python3 .github/scripts/label_from_project.py
           fi
+
+  # Calling the enable endpoint on an already-enabled workflow resets GitHub's 60-day
+  # inactivity timer without needing a commit. Kept as its own job so it still runs when
+  # the labelling job fails (for example, if the bot secrets are missing or rotated).
+  keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Re-enable this workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: gh api --method PUT "repos/${REPO}/actions/workflows/label-from-project.yml/enable"
