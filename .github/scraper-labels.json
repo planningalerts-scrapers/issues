@@ -17,7 +17,11 @@
     "multiple_html_table": "html table",
     "multiple_div_cards": "div_card",
     "multiple_ePlanning": "ePlanning",
-    "master_planbuild": "planbuild (tas)"
+    "master_planbuild": "planbuild (tas)",
+    "multiple_planbuild": "planbuild (tas)",
+    "multiple_dxp_t1": "DxP T1",
+    "multiple_cianywhere_slick_grid": "ci-anywhere",
+    "multiple_t1_data_table": "technology one"
   },
 
   "_system_labels_comment": "Every label that answers 'which system is this authority on'. If an issue already carries one of these, the scraper-derived label is skipped -- that is what protects authorities whose label has deliberately moved ahead of their Scraper (Morph) field.",
